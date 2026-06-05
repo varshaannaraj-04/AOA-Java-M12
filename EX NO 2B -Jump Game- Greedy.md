@@ -1,83 +1,106 @@
 
-# EX 2B Jump Game using Greedy Algorithm.
-## DATE: 05/06/2026
+# EX 2C Job Sequencing using Greedy Approach
+## DATE : 05-06-2026
 ## AIM:
 To write a Java program to for given constraints.
-You are given an array of integers. Each number represents the maximum number of steps you can jump forward from that position.
+Given an integer array nums and an integer k, return the number of pairs (i, j) where i < j such that |nums[i] - nums[j]| == k.
 
-You start from the first element (index 0). 
-Write a program to find the minimum number of jumps required to reach the last index of the array.
+The value of |x| is defined as:
 
-If it is not possible to reach the end, return -1.
+x if x >= 0.
+-x if x < 0.You're given N jobs, each with:
+
+A unique jobId
+
+A deadline (by which it must be completed)
+
+A profit (earned only if completed on or before the deadline)
+
+Each job:
+
+Takes exactly 1 unit of time
+
+Only one job can be done at a time
+
+Your goal is to maximize total profit while completing the maximum number of jobs possible within their deadlines.
+
 ## Algorithm
 1. Start  
-2. Read the integer `n` (size of the array) and input `n` elements into array `nums`.  
-3. If the array is empty, return `-1`. If it has only one element, return `0` (no jumps needed).  
-4. Initialize variables:  
-   - `jumps = 0` → counts the number of jumps made.  
-   - `currentEnd = 0` → the farthest index reachable with the current number of jumps.  
-   - `farthest = 0` → the farthest index reachable overall so far.  
-5. Loop through the array from index `0` to `nums.length - 2`:  
-   - Update `farthest = max(farthest, i + nums[i])`.  
-   - If the current index `i` equals `currentEnd`, increment `jumps` and set `currentEnd = farthest`.  
-   - If `currentEnd` reaches or exceeds the last index, return `jumps` (we can reach the end).  
-   - If `i >= farthest`, return `-1` (cannot move further).  
-6. After the loop, if the end is not reached, return `-1`.  
-7. Print the minimum number of jumps required to reach the end of the array.  
-8. End  
-   
+2. Read the integer `n` (number of jobs).  
+3. For each job, input three values — `id`, `deadline`, and `profit` — and store them in an array of `Job` objects.  
+4. Sort the jobs in **descending order of profit** using a custom comparator.  
+5. Find the maximum deadline among all jobs to determine the total number of available time slots.  
+6. Create a boolean array `slot[]` of size `maxDeadline + 1` to track which time slots are filled.  
+7. Initialize `totalProfit = 0` and `countJobs = 0`.  
+8. For each job in the sorted list:  
+   - Check from its deadline down to 1 to find a free slot.  
+   - If a free slot is found, mark it as occupied (`slot[j] = true`).  
+   - Add the job’s profit to `totalProfit` and increment `countJobs`.  
+9. After scheduling all possible jobs, return the total number of jobs done (`countJobs`) and the total profit (`totalProfit`).  
+10. Print both values.  
+11. End  
+  
 
 ## Program:
 ```
 /*
 Developed by: VARSHA A
-Register Number: 212223220121
+Register Number:  212223220121
 */
-import java.util.Scanner;
+import java.util.*;
 
-public class MinJumpToEnd {
+public class JobScheduling {
 
-    
-    public static int minimumJumps(int[] nums) {
-        if (nums == null || nums.length == 0) return -1;
-        if (nums.length == 1) return 0; 
+    static class Job {
+        int id, deadline, profit;
 
-        int jumps = 0;
-        int currentEnd = 0;
-        int farthest = 0;
+        Job(int id, int deadline, int profit) {
+            this.id = id;
+            this.deadline = deadline;
+            this.profit = profit;
+        }
+    }
 
-        for (int i = 0; i < nums.length - 1; i++) {
-            farthest = Math.max(farthest, i + nums[i]);
+    public static int[] jobScheduling(Job[] jobs, int n) {
+        Arrays.sort(jobs, (a, b) -> b.profit - a.profit);
 
-          
-            if (i == currentEnd) {
-                jumps++;
-                currentEnd = farthest;
+        int maxDeadline = 0;
+        for (Job job : jobs) {
+            maxDeadline = Math.max(maxDeadline, job.deadline);
+        }
 
-                if (currentEnd >= nums.length - 1) {
-                    return jumps; 
+        boolean[] slot = new boolean[maxDeadline + 1];
+        int totalProfit = 0;
+        int countJobs = 0;
+
+        for (Job job : jobs) {
+            for (int j = job.deadline; j > 0; j--) {
+                if (!slot[j]) {
+                    slot[j] = true;
+                    totalProfit += job.profit;
+                    countJobs++;
+                    break;
                 }
-            }
-
-            if (i >= farthest) { 
-                return -1;
             }
         }
 
-        return -1; 
+        return new int[]{countJobs, totalProfit};
     }
 
-    
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         int n = sc.nextInt();
-        int[] nums = new int[n];
+        Job[] jobs = new Job[n];
 
         for (int i = 0; i < n; i++) {
-            nums[i] = sc.nextInt();
+            int id = sc.nextInt();
+            int deadline = sc.nextInt();
+            int profit = sc.nextInt();
+            jobs[i] = new Job(id, deadline, profit);
         }
 
-        System.out.println("Minimum jumps to reach last index: " + minimumJumps(nums));
+        int[] result = jobScheduling(jobs, n);
+        System.out.println(result[0] + " " + result[1]);
     }
 }
 
@@ -85,7 +108,7 @@ public class MinJumpToEnd {
 
 ## Output:
 
-<img width="1105" height="445" alt="image" src="https://github.com/user-attachments/assets/9643b55b-9541-4bcd-9ac7-9b4a1b21ceef" />
+<img width="821" height="551" alt="image" src="https://github.com/user-attachments/assets/e59960d0-7182-4f2a-bead-6f588a1329ba" />
 
 
 ## Result:
